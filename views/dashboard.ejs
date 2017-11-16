@@ -1,0 +1,48 @@
+<html>
+<head>
+    <title>SysMail</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <style type="text/css">
+        .mail{
+            overflow-wrap: normal;
+            overflow: auto;
+            border: solid;
+            border-color: #165ba8;
+            border-width: thick;
+        }
+    </style>
+    <script type="text/javascript" src="/javascripts/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/javascripts/custom.js"></script>
+    <script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/javascripts/socket.io.js"></script>
+    <script type="text/javascript">
+        var socket = io();
+        $(window).on("load",function(){
+            socket.emit('new_user',{email: '<%=session.passport.user.email%>'})
+        });
+        socket.on('new_mail',function(data){
+            var box = "<div class='mail'><b>Sent By:"+data.sender+"</b><br><b>Date:</b>"+data.date+"<br><b>Subject:</b>"+data.subject+"<br>"+data.content+"</div>";
+            $('#emails').prepend(box);
+        });
+    </script>
+</head>
+<body>
+<% include templates/header_auth.ejs %>
+<div class="container-fluid container">
+    <%if(msg.length>0){%>
+        <div class="alert alert-success"><%=msg%></div>
+    <%}%>
+    <div id="emails">
+    <%mail.forEach(function(item,index){%>
+        <div class="mail">
+            <b>Sent by:<%=item.sender%></b><br>
+            <b>Date:</b> <%=item.date%><br>
+            <b>Subject:</b><%=item.subject%><br>
+            <%=item.content%>
+        </div>
+    <%})%>
+    </div>
+</div>
+</body>
+</html>
